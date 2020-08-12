@@ -1,4 +1,3 @@
-# MasterRad
 ## Integrisano planiranje kretanja i redosleda izvršavanja zadataka korišćenjem SMT rešavača
 ### Aleksandra Đurić, 1079/2015, Matematički fakultet u Beogradu
 
