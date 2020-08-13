@@ -82,7 +82,7 @@ bool Planiranje::generisi_plan()
         }
 
         //dodavanje ogranicenja za maksimalnu duzinu predjene putanje
-        robot_resavac.add(maksimalna_duzina == 50);
+        robot_resavac.add(maksimalna_duzina == 200);
         robot_resavac.add(ukupna_predjena_putanja < maksimalna_duzina);
 
         //dodavanje informacija o tome koje pozicije u masini za obradu blokiraju jedne druge
