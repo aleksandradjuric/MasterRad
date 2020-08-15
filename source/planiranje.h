@@ -12,11 +12,12 @@
 class Planiranje
 {
 public:
-    Planiranje(Domen _domen, Scena* _scena);
+    Planiranje(Domen _domen, Scena* _scena, int _maksimalna_duzinja_putanje);
     bool generisi_plan();
 private:
     Domen domen;
     Scena* scena;
+    int maksimalna_duzinja_putanje;
 };
 
 #endif // PLANIRANJE_H

@@ -1,6 +1,7 @@
 #include "scena.h"
 
-Scena::Scena()
+Scena::Scena(QObject *parent)
+    :QObject(parent)
 {
 }
 
@@ -117,13 +118,21 @@ vector<std::pair<int, bool>> Scena::uzmi_pozicije_predmeta(vector<Predmet> stanj
     return pozicije_predmeta;
 }
 
-void Scena::nacrtaj_plan()
+void Scena::nacrtaj_plan(int trenutni_frejm)
 {
-    for (unsigned i=0; i<stanja_scene.size(); i++)
+    for (unsigned i=trenutni_frejm; i<stanja_scene.size(); i++)
     {
-        vector<std::pair<int, bool>> pozicije_predmeta = uzmi_pozicije_predmeta(stanja_scene[i].second);
-        oblast_za_crtanje->azuriraj_stanje_scene(stanja_scene[i].first, pozicije_predmeta);
+        if (!animacija_u_toku)
+            break;
+        nacrtaj_stanje_scene(i);
+        emit on_azuriraj_slajderSignal(i);
     }
+}
+
+void Scena::nacrtaj_stanje_scene(int trenutni_frejm)
+{
+    vector<std::pair<int, bool>> pozicije_predmeta = uzmi_pozicije_predmeta(stanja_scene[trenutni_frejm].second);
+    oblast_za_crtanje->azuriraj_stanje_scene(stanja_scene[trenutni_frejm].first, pozicije_predmeta, animacija_u_toku);
 }
 
 void Scena::ocisti_scenu()
@@ -131,6 +140,16 @@ void Scena::ocisti_scenu()
     oblast_za_crtanje->ocisti_scenu();
     predmeti.clear();
     stanja_scene.clear();
+}
+
+int Scena::uzmi_duzinu_stanja_scene()
+{
+    return stanja_scene.size();
+}
+
+void Scena::promeni_stanje_animacije(bool stanje)
+{
+    animacija_u_toku = stanje;
 }
 
 //class Predmet

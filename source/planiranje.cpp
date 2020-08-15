@@ -4,10 +4,11 @@
 using namespace std;
 using namespace z3;
 
-Planiranje::Planiranje(Domen _domen, Scena* _scena)
+Planiranje::Planiranje(Domen _domen, Scena* _scena, int _maksimalna_duzinja_putanje)
 {
     domen = _domen;
     scena = _scena;
+    maksimalna_duzinja_putanje = _maksimalna_duzinja_putanje;
 }
 
 bool Planiranje::generisi_plan()
@@ -81,7 +82,7 @@ bool Planiranje::generisi_plan()
         }
 
         //dodavanje ogranicenja za maksimalnu duzinu predjene putanje
-        robot_resavac.add(maksimalna_duzina == 300);
+        robot_resavac.add(maksimalna_duzina == maksimalna_duzinja_putanje);
         robot_resavac.add(ukupna_predjena_putanja < maksimalna_duzina);
 
         //dodavanje informacija o tome koje pozicije u masini za obradu blokiraju jedne druge

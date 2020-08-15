@@ -249,9 +249,10 @@ void Oblast_za_crtanje::nacrtaj_scenu(int indeks_b_tacke_robota, std::vector<std
     scene()->update();
 }
 
-void Oblast_za_crtanje::azuriraj_stanje_scene(int indeks_b_tacke_robota, std::vector<std::pair<int, bool> > pozicije_predmeta)
+void Oblast_za_crtanje::azuriraj_stanje_scene(int indeks_b_tacke_robota, std::vector<std::pair<int, bool> > pozicije_predmeta, bool animacija_u_toku)
 {
-    Oblast_za_crtanje::delay(1);
+    if (animacija_u_toku)
+        Oblast_za_crtanje::delay(1);
     QPoint pozicija_b_tacke_robota = b_tacke_za_iscrtavanje[indeks_b_tacke_robota]->uzmi_poziciju();
     robot_za_iscrtavanje->promeni_poziciju(pozicija_b_tacke_robota.x()-30, pozicija_b_tacke_robota.y()-45);
     for(unsigned i=0; i<pozicije_predmeta.size(); i++){

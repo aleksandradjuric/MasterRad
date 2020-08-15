@@ -63,7 +63,7 @@ public:
     void dodaj_putanju(Objekat_za_iscrtavanje* prva_b_tacka, Objekat_za_iscrtavanje* druga_b_tacka, int duzina, bool direktna_putanja);
     void dodaj_putanju_flojd_varsal(Objekat_za_iscrtavanje* prva_b_tacka, Objekat_za_iscrtavanje* druga_b_tacka, int duzina, bool direktna_putanja);
     void nacrtaj_scenu(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>> pozicije_predmeta);
-    void azuriraj_stanje_scene(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>> pozicije_predmeta);
+    void azuriraj_stanje_scene(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>> pozicije_predmeta, bool animacija_u_toku);
     void nacrtaj_domen();
     void ocisti_scenu();
     void delay(int sekunde);
