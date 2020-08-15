@@ -1,6 +1,7 @@
 #ifndef DOMEN_H
 #define DOMEN_H
 
+#include "oblast_za_crtanje.h"
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -9,7 +10,6 @@
 #include <algorithm>
 #include <QPoint>
 #include <QGraphicsItem>
-#include "oblast_za_crtanje.h"
 
 #define INF 99999
 
@@ -20,9 +20,7 @@ class Povrsina
 {
 public:
     Povrsina(string _naziv);
-
     string uzmi_ime_povrsine();
-    //nece se menjati tokom izvrsavanja programa, inicijalizuje se konstruktorom
 private:
     string naziv;
 };
@@ -32,7 +30,6 @@ class B_tacka
 public:
     B_tacka(int _indeks_povrsine);
     int uzmi_indeks_povrsine();
-    //nece se menjati tokom izvrsavanja programa, inicijalizuje se konstruktorom
 private:
     int indeks_povrsine;
 };
@@ -42,7 +39,6 @@ class S_tacka
 public:
     S_tacka(int _indeks_b_tacke);
     int uzmi_indeks_b_tacke();
-    //nece se menjati tokom izvrsavanja programa, inicijalizuje se konstruktorom
 private:
     int indeks_b_tacke;
 };
@@ -56,7 +52,6 @@ public:
     int uzmi_indeks_druge_b_tacke();
     int uzmi_duzinu();
     vector<int> uzmi_sekvencu_b_tacki();
-    //informacije ce se dodati konstruktorom jednom tokom inicijalizacije, nakon primene Flojd-Varsalovog algoritma, nece se menjati
 private:
     int indeks_b_tacke_1;
     int indeks_b_tacke_2;

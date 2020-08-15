@@ -15,8 +15,9 @@
 class Objekat_za_iscrtavanje : public QGraphicsItem
 {
 public:
-    enum Oblik { krug, kvadrat, elipsa };
+    enum Oblik { krug, kvadrat, elipsa, ispunjeni_kvadrat };
     Objekat_za_iscrtavanje(int x, int y, QColor _boja, int _velicina, Oblik _oblik, std::string _naziv);
+    ~Objekat_za_iscrtavanje();
     QPoint Point () const;
     int uzmi_x_tacku_pozicije();
     int uzmi_y_tacku_pozicije();
@@ -24,8 +25,6 @@ public:
     QPoint uzmi_poziciju();
     void promeni_poziciju(int x, int y);
     void postavi_poziciju(QPoint nova_pozicija);
-    ~Objekat_za_iscrtavanje();
-
 protected:
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
@@ -41,9 +40,9 @@ class Putanja_za_iscrtavanje
 {
 public:
     Putanja_za_iscrtavanje(Objekat_za_iscrtavanje* prva_b_tacka, Objekat_za_iscrtavanje* druga_b_tacka, int _duzina, bool _direktna_putanja);
+    ~Putanja_za_iscrtavanje();
     QGraphicsLineItem *Linija();
     QGraphicsTextItem *Duzina();
-    ~Putanja_za_iscrtavanje();
 private:
     QGraphicsLineItem* linija;
     QGraphicsTextItem* duzina;

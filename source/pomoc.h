@@ -14,7 +14,6 @@ class Pomoc : public QWidget
 public:
     explicit Pomoc(QWidget *parent = 0);
     ~Pomoc();
-
 private:
     Ui::Pomoc *ui;
 };

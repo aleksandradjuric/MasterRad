@@ -1,70 +1,12 @@
 #include "domen.h"
 #include "oblast_za_crtanje.h"
 
-#include <QDebug>
-
 Domen::Domen()
 {
 }
 
 Domen::~Domen()
 {}
-
-Povrsina::Povrsina(string _naziv)
-    : naziv(_naziv)
-{}
-
-string Povrsina::uzmi_ime_povrsine()
-{
-    return naziv;
-}
-
-B_tacka::B_tacka(int _indeks_povrsine)
-    : indeks_povrsine(_indeks_povrsine)
-{
-}
-
-int B_tacka::uzmi_indeks_povrsine()
-{
-    return indeks_povrsine;
-}
-
-S_tacka::S_tacka(int _indeks_b_tacke)
-    : indeks_b_tacke(_indeks_b_tacke)
-{}
-
-int S_tacka::uzmi_indeks_b_tacke()
-{
-    return indeks_b_tacke;
-}
-
-Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina)
-    : indeks_b_tacke_1(_indeks_b_tacke_1), indeks_b_tacke_2(_indeks_b_tacke_2), duzina(_duzina)
-{}
-
-Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina, vector<int> _sekvenca_b_tacki)
-    : indeks_b_tacke_1(_indeks_b_tacke_1), indeks_b_tacke_2(_indeks_b_tacke_2), duzina(_duzina), sekvenca_b_tacki(_sekvenca_b_tacki)
-{}
-
-int Putanja::uzmi_indeks_prve_b_tacke()
-{
-    return indeks_b_tacke_1;
-}
-
-int Putanja::uzmi_indeks_druge_b_tacke()
-{
-    return indeks_b_tacke_2;
-}
-
-int Putanja::uzmi_duzinu()
-{
-    return duzina;
-}
-
-vector<int> Putanja::uzmi_sekvencu_b_tacki()
-{
-    return sekvenca_b_tacki;
-}
 
 void Domen::inicijalizuj_domen(string putanja_do_fajla)
 {
@@ -110,7 +52,6 @@ void Domen::inicijalizuj_domen(string putanja_do_fajla)
               else{
                   switch (trenutno_se_konfigurise) {
                   case povrsina:
-//                      naziv_povrsine = linija;
                       linija_stream >> naziv_povrsine >> x >> y;
                       povrsine.push_back(Povrsina(naziv_povrsine));
                       oblast_za_crtanje->dodaj_povrsinu(x, y, naziv_povrsine);
@@ -146,7 +87,7 @@ void Domen::inicijalizuj_domen(string putanja_do_fajla)
       }
       konfiguracioni_fajl_za_domen.close();
       nadji_najkrace_putanje_izmedju_b_tacaka();
-      for (int i = 0; i < putanje.size(); i++) {
+      for (unsigned i = 0; i < putanje.size(); i++) {
           if (putanje[i].uzmi_duzinu() > 0)
             oblast_za_crtanje->dodaj_putanju_flojd_varsal(oblast_za_crtanje->uzmi_b_tacku_za_iscrtavanje(putanje[i].uzmi_indeks_prve_b_tacke()),
                                                           oblast_za_crtanje->uzmi_b_tacku_za_iscrtavanje(putanje[i].uzmi_indeks_druge_b_tacke()),
@@ -156,15 +97,6 @@ void Domen::inicijalizuj_domen(string putanja_do_fajla)
     else std::cout << "Nije moguce otvoriti fajl" << std::endl;
 
     oblast_za_crtanje->nacrtaj_domen();
-
-//    for (int i = 0; i < b_tacke_za_iscrtavanje.size(); i++) {
-//        qDebug() << b_tacke_za_iscrtavanje[i]->uzmi_x_tacku_centra() << " " << b_tacke_za_iscrtavanje[i]->uzmi_y_tacku_centra();
-//    }
-
-//    for (int i = 0; i < s_tacke.size(); i++) {
-//        qDebug() << s_tacke[i].uzmi_indeks_b_tacke();
-//    }
-
 }
 
 int Domen::uzmi_duzinu_niza_povrsina()
@@ -266,7 +198,6 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
            pocetna_matrica_putanja[indeks_b_tacke2][indeks_b_tacke1] =  duzina_putanje;
         }
     }
-//    ispisi_matricu(pocetna_matrica_putanja);
 
     //inicijalizacija matrice prelaza
     for (int i=0; i<duzina_niza_b_tacaka; i++) {
@@ -292,9 +223,6 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
             }
         }
     }
-
-//    ispisi_matricu(rezultujuca_matrica_putanja);
-//    ispisi_matricu(matrica_prelaza);
 
     putanje.clear();
     for(int i=0; i<duzina_niza_b_tacaka; i++){
@@ -347,6 +275,8 @@ vector<int> Domen::uzmi_sekvencu_tacaka_za_par_b_tacaka(int indeks_b_tacke_1, in
         if(putanje[i].uzmi_indeks_prve_b_tacke() == indeks_b_tacke_1 &&
            putanje[i].uzmi_indeks_druge_b_tacke() == indeks_b_tacke_2)
             return putanje[i].uzmi_sekvencu_b_tacki();
+
+    return vector<int>();
 }
 
 void Domen::ocisti_domen()
@@ -357,4 +287,64 @@ void Domen::ocisti_domen()
     putanje.clear();
     medjusobna_blokiranja_s_tacaka.clear();
     matrica_prelaza.clear();
+}
+
+//class Putanja
+Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina)
+    : indeks_b_tacke_1(_indeks_b_tacke_1), indeks_b_tacke_2(_indeks_b_tacke_2), duzina(_duzina)
+{}
+
+Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina, vector<int> _sekvenca_b_tacki)
+    : indeks_b_tacke_1(_indeks_b_tacke_1), indeks_b_tacke_2(_indeks_b_tacke_2), duzina(_duzina), sekvenca_b_tacki(_sekvenca_b_tacki)
+{}
+
+int Putanja::uzmi_indeks_prve_b_tacke()
+{
+    return indeks_b_tacke_1;
+}
+
+int Putanja::uzmi_indeks_druge_b_tacke()
+{
+    return indeks_b_tacke_2;
+}
+
+int Putanja::uzmi_duzinu()
+{
+    return duzina;
+}
+
+vector<int> Putanja::uzmi_sekvencu_b_tacki()
+{
+    return sekvenca_b_tacki;
+}
+
+//class Povrsina
+Povrsina::Povrsina(string _naziv)
+    : naziv(_naziv)
+{}
+
+string Povrsina::uzmi_ime_povrsine()
+{
+    return naziv;
+}
+
+//class B_tacka
+B_tacka::B_tacka(int _indeks_povrsine)
+    : indeks_povrsine(_indeks_povrsine)
+{
+}
+
+int B_tacka::uzmi_indeks_povrsine()
+{
+    return indeks_povrsine;
+}
+
+//class S_tacka
+S_tacka::S_tacka(int _indeks_b_tacke)
+    : indeks_b_tacke(_indeks_b_tacke)
+{}
+
+int S_tacka::uzmi_indeks_b_tacke()
+{
+    return indeks_b_tacke;
 }

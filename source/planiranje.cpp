@@ -67,7 +67,6 @@ bool Planiranje::generisi_plan()
             uslov_za_sve_putanje = uslov_za_sve_putanje || (uslov_za_putanju1 && uslov_za_putanju2 && uslov_za_putanju3 && uslov_za_putanju4);
         }
         robot_resavac.add(uslov_za_sve_putanje);
-        //stream << uslov_za_sve_putanje.to_string() << "\n";
 
         //izdvajanje indeksa b tacke masine za obradu i skladista
         int indeks_b_tacke_masine, indeks_b_tacke_skladista;
@@ -82,7 +81,7 @@ bool Planiranje::generisi_plan()
         }
 
         //dodavanje ogranicenja za maksimalnu duzinu predjene putanje
-        robot_resavac.add(maksimalna_duzina == 200);
+        robot_resavac.add(maksimalna_duzina == 300);
         robot_resavac.add(ukupna_predjena_putanja < maksimalna_duzina);
 
         //dodavanje informacija o tome koje pozicije u masini za obradu blokiraju jedne druge
@@ -101,7 +100,7 @@ bool Planiranje::generisi_plan()
                 s_tacke_skladista.push_back(i);
         int duzina_niza_s_tacaka_skladista = s_tacke_skladista.size();
 
-        // dodavanje informacija o tome koje s tacke blokiraju jedne druge
+        //dodavanje informacija o tome koje s tacke blokiraju jedne druge
         expr informacije_o_blokiranju = boolean_true;
         for(i=0; i<duzina_niza_s_tacaka; i++)
             for(j=0; j<duzina_niza_s_tacaka; j++)
@@ -117,7 +116,6 @@ bool Planiranje::generisi_plan()
                 if(scena->uzmi_predmet(i).uzmi_velicinu() > scena->uzmi_predmet(j).uzmi_velicinu())
                     odnos_velicina = odnos_velicina && (veci(robot_kontekst.int_val(i), robot_kontekst.int_val(j)) == boolean_true);
         robot_resavac.add(odnos_velicina);
-        //ISPIS stream << "informacije o odnosu velicine predmeta: " << "\n" << robosint_resavac.to_smt2() << "\n";
 
         /* PAKOVANJE PREDMETA U MASINU ZA OBRADU */
         bool uslov_petlje = false;
@@ -191,11 +189,9 @@ bool Planiranje::generisi_plan()
             //izabrano mesto u masini za obradu ne treba da blokira ostala prazna mesta u masini
             expr izabrano_mesto_ne_blokira_prazno_mesto = boolean_true;
             for(i=0; i<duzina_niza_slobodnih_mesta_u_masini; i++){
-                //if(slobodna_mesta_u_masini[i] != izabrano_mesto_u_masini)
                 izabrano_mesto_ne_blokira_prazno_mesto = izabrano_mesto_ne_blokira_prazno_mesto && (blokira(izabrano_mesto_u_masini, robot_kontekst.int_val(slobodna_mesta_u_masini[i])) == boolean_false);
             }
             robot_resavac.add(izabrano_mesto_ne_blokira_prazno_mesto);
-    //        stream << izabrano_mesto_ne_blokira_prazno_mesto.to_string() << "\n";
 
             //ne postoji veci predmet koji ceka obradu od izabranog predmeta koji nije vec u masini
             expr ne_postoji_veci_van_masine = boolean_true;
@@ -205,12 +201,10 @@ bool Planiranje::generisi_plan()
             robot_resavac.add(ne_postoji_veci_van_masine);
             robot_resavac.add(izabrani_predmet_nije_u_masini(izabrani_predmet) == boolean_true);
             robot_resavac.add(dodatni_uslov); //odsecanje - ako je pao na nekom od naredna dva koraka
-            //ISPIS stream << robosint_resavac.to_smt2() << "\n";
 
             int izabrani_predmet_dobijen_iz_modela;
             int izabrano_mesto_u_masini_dobijeno_iz_modela;
             int duzina_putanje_dobijena_iz_modela;
-            //ISPIS stream << robosint_resavac << "\n";
 
             switch (robot_resavac.check())
             {
@@ -270,7 +264,7 @@ bool Planiranje::generisi_plan()
                 int pozicija_robota_pre_koraka_pokupi = scena->uzmi_trenutnu_poziciju_robota();
                 vector<int> sekvenca_b_tacaka;
 
-                // postoji putanja od trenutne pozicije do pozicije izabranog predmeta
+                //postoji putanja od trenutne pozicije do pozicije izabranog predmeta
                 //opis putanja je vec dodat, dodaju se samo uslovi koji treba da budu ispunjeni:
                 robot_resavac.add(trenutna_pozicija == pozicija_robota_pre_koraka_pokupi);
                 robot_resavac.add(putanja(trenutna_pozicija, b) == boolean_true);
@@ -284,7 +278,6 @@ bool Planiranje::generisi_plan()
                 robot_resavac.add(ne_postoji_predmet_koji_blokira_izabrani_predmet);
 
                 int b_dobijeno_iz_modela;
-                //ISPIS stream << robosint_resavac.to_smt2() << "\n";
                 switch (robot_resavac.check())
                 {
                     case unknown:
@@ -296,9 +289,8 @@ bool Planiranje::generisi_plan()
                                 break;
                     case sat:   stream << "* korak POKUPI je SAT *\n";
                             model dobijeni_model = robot_resavac.get_model();
-    //                        std::cout << dobijeni_model << std::endl;
                             drugi_korak_je_zadovoljiv = true;
-                            // obilazak modela
+                            //obilazak modela
                             for (unsigned i = 0; i < dobijeni_model.size(); i++) {
                                 func_decl v = dobijeni_model[i];
                                 if(v.name().str() == "b")
@@ -309,7 +301,7 @@ bool Planiranje::generisi_plan()
                                 }
                             }
                             sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(pozicija_robota_pre_koraka_pokupi, b_dobijeno_iz_modela);
-                            for (int i = 0; i < sekvenca_b_tacaka.size(); i++)
+                            for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                 scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                             scena->promeni_trenutnu_poziciju_robota(b_dobijeno_iz_modela);
                             stream << "pozicija robota je promenjena \n" << "trenutna pozicija robota je b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << "\n";
@@ -354,7 +346,6 @@ bool Planiranje::generisi_plan()
                     //robot drzi izabrani predmet
                     robot_resavac.add(robot_drzi_izabrani_predmet == boolean_true);
 
-                    //ISPIS stream << robosint_resavac.to_smt2() << "\n";
                     Predmet& p = scena->uzmi_predmet(izabrani_predmet_dobijen_iz_modela);
                     switch (robot_resavac.check())
                     {
@@ -365,13 +356,11 @@ bool Planiranje::generisi_plan()
                                     p.spusti_predmet();
                                     scena->dodaj_stanje_scene(trenutna_pozicija_robota);
                                     stream << "robot je vratio predmet " << izabrani_predmet_dobijen_iz_modela <<  " na njegovu prethodnu poziciju\n";
-//                                  scena->promeni_trenutnu_poziciju_robota(pozicija_robota_pre_koraka_pokupi);
                                     stream << "trenutna pozicija robota: b[" << scena->uzmi_trenutnu_poziciju_robota() << "]\n";
                                     stream << "--------------------------------\n";
                                     break;
                         case sat:   stream << "* korak SMESTI je SAT *\n";
                                     model dobijeni_model = robot_resavac.get_model();
-//                                  std::cout << dobijeni_model << std::endl;
                                     // obilazak modela
                                     for (unsigned i = 0; i < dobijeni_model.size(); i++) {
                                         func_decl v = dobijeni_model[i];
@@ -384,7 +373,7 @@ bool Planiranje::generisi_plan()
                                     stream << "pozicija robota je promenjena \n" << "trenutna pozicija robota je b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << "\n";
                                     stream << "do cvora b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << " je predjen put " << duzina_putanje_dobijena_iz_modela << "\n";
                                     sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(trenutna_pozicija_robota, scena->uzmi_trenutnu_poziciju_robota());
-                                    for (int i = 0; i < sekvenca_b_tacaka.size(); i++)
+                                    for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                         scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                                     p.spusti_predmet();
                                     p.promeni_poziciju(izabrano_mesto_u_masini_dobijeno_iz_modela);
@@ -420,7 +409,6 @@ bool Planiranje::generisi_plan()
             for (int i=0; i<duzina_niza_predmeta; i++)
                 uslov_petlje = uslov_petlje || ((domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista) && !(scena->uzmi_predmet(i).da_li_ceka_obradu()));
 
-            //prvi_korak_je_zadovoljiv = true;
             dodatni_uslov = boolean_true;
 
             while (uslov_petlje && prvi_korak_je_zadovoljiv)
@@ -486,11 +474,9 @@ bool Planiranje::generisi_plan()
                 }
                 robot_resavac.add(izabrano_mesto_ne_blokira_prazno_mesto);
                 robot_resavac.add(dodatni_uslov); //odsecanje - ako je pao na nekom od naredna dva koraka
-                //ISPIS stream << robosint_resavac.to_smt2() << "\n";
 
                 int izabrani_predmet_dobijen_iz_modela;
                 int izabrano_mesto_u_skladistu_dobijeno_iz_modela;
-                //ISPIS stream << robosint_resavac << "\n";
                 int duzina_putanje_dobijena_iz_modela;
 
                 switch (robot_resavac.check())
@@ -554,7 +540,7 @@ bool Planiranje::generisi_plan()
                     int pozicija_robota_pre_koraka_pokupi = scena->uzmi_trenutnu_poziciju_robota();
                     vector<int> sekvenca_b_tacaka;
 
-                    // postoji putanja od trenutne pozicije do b tacke skladista
+                    //postoji putanja od trenutne pozicije do b tacke skladista
                     //opis putanja je vec dodat, dodaju se samo uslovi koji treba da budu ispunjeni:
                     robot_resavac.add(trenutna_pozicija == pozicija_robota_pre_koraka_pokupi);
                     robot_resavac.add(putanja(trenutna_pozicija, b) == boolean_true);
@@ -568,7 +554,6 @@ bool Planiranje::generisi_plan()
 
                     robot_resavac.add(ne_postoji_predmet_koji_blokira_izabrani_predmet);
 
-                    //ISPIS stream << robosint_resavac.to_smt2() << "\n";
                     switch (robot_resavac.check())
                     {
                         case unknown:
@@ -580,7 +565,6 @@ bool Planiranje::generisi_plan()
                                     break;
                         case sat:   stream << "* korak POKUPI je SAT *\n";
                                 model dobijeni_model = robot_resavac.get_model();
-     //                        std::cout << dobijeni_model << std::endl;
                                 drugi_korak_je_zadovoljiv = true;
                                 // obilazak modela
                                 for (unsigned i = 0; i < dobijeni_model.size(); i++) {
@@ -591,7 +575,7 @@ bool Planiranje::generisi_plan()
                                     }
                                 }
                                 sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(pozicija_robota_pre_koraka_pokupi, indeks_b_tacke_masine);
-                                for (int i = 0; i < sekvenca_b_tacaka.size(); i++)
+                                for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                     scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                                 scena->promeni_trenutnu_poziciju_robota(indeks_b_tacke_masine);
                                 stream << "pozicija robota je promenjena \n" << "trenutna pozicija robota je b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << "\n";
@@ -637,7 +621,6 @@ bool Planiranje::generisi_plan()
                         //robot drzi izabrani predmet
                         robot_resavac.add(robot_drzi_izabrani_predmet == boolean_true);
 
-                        //ISPIS stream << robosint_resavac.to_smt2() << "\n";
                         Predmet& p = scena->uzmi_predmet(izabrani_predmet_dobijen_iz_modela);
                         switch (robot_resavac.check())
                         {
@@ -648,13 +631,11 @@ bool Planiranje::generisi_plan()
                                         p.spusti_predmet();
                                         scena->dodaj_stanje_scene(trenutna_pozicija_robota);
                                         stream << "robot je vratio predmet " << izabrani_predmet_dobijen_iz_modela <<  " na njegovu prethodnu poziciju\n";
-        //                                scena->promeni_trenutnu_poziciju_robota(pozicija_robota_pre_koraka_pokupi);
                                         stream << "trenutna pozicija robota: b[" << scena->uzmi_trenutnu_poziciju_robota() << "]\n";
                                         stream << "--------------------------------\n";
                                         break;
                             case sat:   stream << "* korak SMESTI je SAT *\n";
                                         model dobijeni_model = robot_resavac.get_model();
-        //                                std::cout << dobijeni_model << std::endl;
                                         // obilazak modela
                                         for (unsigned i = 0; i < dobijeni_model.size(); i++) {
                                             func_decl v = dobijeni_model[i];
@@ -664,7 +645,7 @@ bool Planiranje::generisi_plan()
                                             }
                                         }
                                         sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(indeks_b_tacke_masine, indeks_b_tacke_skladista);
-                                        for (int i = 0; i < sekvenca_b_tacaka.size(); i++)
+                                        for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                             scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                                         scena->promeni_trenutnu_poziciju_robota(indeks_b_tacke_skladista);
                                         stream << "pozicija robota je promenjena \n" << "trenutna pozicija robota je b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << "\n";

@@ -62,12 +62,16 @@ QRectF Objekat_za_iscrtavanje::boundingRect() const
 
 void Objekat_za_iscrtavanje::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED (option);
+    Q_UNUSED (widget);
+
     QBrush b;
     QPen p;
     b.setStyle(Qt::SolidPattern);
     b.setColor(Qt::white);
     p.setColor(boja);
-    p.setWidth(3);
+    p.setWidth(2);
+    painter->setRenderHint(QPainter::Antialiasing);
 
     painter->setBrush(b);
     painter->setPen(p);
@@ -89,7 +93,18 @@ void Objekat_za_iscrtavanje::paint(QPainter *painter, const QStyleOptionGraphics
         painter->drawEllipse(pozicija.x() - velicina/2, pozicija.y() - velicina/2, velicina*1.5, velicina);
         painter->drawText(pozicija.x()-velicina*0.25, pozicija.y()+velicina*0.17, QString(naziv.c_str()));
     }
+    else if(oblik == ispunjeni_kvadrat)
+    {
+        QRect r = QRect(pozicija.x(), pozicija.y(), velicina*1.5, velicina);
+        p.setColor(Qt::black);
+        b.setColor(boja);
 
+        painter->setPen(p);
+        painter->setBrush(b);
+        painter->setFont(QFont("times", 14));
+        painter->drawRoundRect(r, 25, 25);
+        painter->drawText(pozicija.x(), pozicija.y() - 5, QString(naziv.c_str()));
+    }
 }
 
 //class Putanje_za_iscrtavanje
@@ -105,10 +120,9 @@ Putanja_za_iscrtavanje::Putanja_za_iscrtavanje(Objekat_za_iscrtavanje* _prva_b_t
     duzina = new QGraphicsTextItem();
     duzina->setPlainText(QString::number(_duzina));
 
-    int x_pozicija_teksta, y_pozicija_teksta, velicina;
+    int x_pozicija_teksta, y_pozicija_teksta;
     int prva_b_tacka_x, prva_b_tacka_y, druga_b_tacka_x, druga_b_tacka_y;
 
-    velicina = _prva_b_tacka->uzmi_velicinu();
     prva_b_tacka_x = _prva_b_tacka->uzmi_x_tacku_pozicije();
     prva_b_tacka_y = _prva_b_tacka->uzmi_y_tacku_pozicije();
     druga_b_tacka_x = _druga_b_tacka->uzmi_x_tacku_pozicije();
@@ -220,7 +234,7 @@ Oblast_za_crtanje::Oblast_za_crtanje(QWidget *parent)
 void Oblast_za_crtanje::nacrtaj_scenu(int indeks_b_tacke_robota, std::vector<std::pair<int, bool> > pozicije_predmeta)
 {
     QPoint pozicija_b_tacke_robota = QPoint(b_tacke_za_iscrtavanje[indeks_b_tacke_robota]->uzmi_poziciju());
-    robot_za_iscrtavanje = new Objekat_za_iscrtavanje(pozicija_b_tacke_robota.x()-30, pozicija_b_tacke_robota.y()-45, Qt::red, 40, Objekat_za_iscrtavanje::Oblik::kvadrat, "robot");
+    robot_za_iscrtavanje = new Objekat_za_iscrtavanje(pozicija_b_tacke_robota.x()-30, pozicija_b_tacke_robota.y()-45, Qt::darkRed, 40, Objekat_za_iscrtavanje::Oblik::ispunjeni_kvadrat, "robot");
     scene()->addItem(robot_za_iscrtavanje);
     for(unsigned i=0; i<pozicije_predmeta.size(); i++){
         if(pozicije_predmeta[i].second)
@@ -267,8 +281,10 @@ void Oblast_za_crtanje::nacrtaj_domen()
     //iscrtavanje s tacaka
     for(i=0; i<s_tacke_za_iscrtavanje.size(); i++)
         scene()->addItem(s_tacke_za_iscrtavanje[i]);
+    //iscrtavanje putanja
     for(i=0; i<putanje_za_iscrtavanje.size(); i++)
         scene()->addItem(putanje_za_iscrtavanje[i]->Duzina());
+    //iscrtavanje blokiranja
     for(i=0; i<blokiranja_za_iscrtavanje.size(); i++)
         scene()->addItem(blokiranja_za_iscrtavanje[i]);
     scene()->update();
@@ -287,8 +303,10 @@ void Oblast_za_crtanje::nacrtaj_domen()
     //iscrtavanje s tacaka
     for(i=0; i<s_tacke_za_iscrtavanje.size(); i++)
         scene()->removeItem(s_tacke_za_iscrtavanje[i]);
+    //iscrtavanje putanja
     for(i=0; i<putanje_za_iscrtavanje.size(); i++)
         scene()->removeItem(putanje_za_iscrtavanje[i]->Duzina());
+    //iscrtavanje blokiranja
     for(i=0; i<blokiranja_za_iscrtavanje.size(); i++)
         scene()->removeItem(blokiranja_za_iscrtavanje[i]);
     scene()->update();
@@ -297,17 +315,18 @@ void Oblast_za_crtanje::nacrtaj_domen()
     for(i=0; i<povrsine_za_iscrtavanje.size(); i++)
         scene()->addItem(povrsine_za_iscrtavanje[i]);
     //iscrtavanje inicijalnih putanja
-    for(i=0; i<putanje_flojd_varsal.size(); i++){
+    for(i=0; i<putanje_flojd_varsal.size(); i++)
         scene()->addItem(putanje_flojd_varsal[i]->Linija());
-    }
     //iscrtavanje b tacaka
     for(i=0; i<b_tacke_za_iscrtavanje.size(); i++)
         scene()->addItem(b_tacke_za_iscrtavanje[i]);
     //iscrtavanje s tacaka
     for(i=0; i<s_tacke_za_iscrtavanje.size(); i++)
         scene()->addItem(s_tacke_za_iscrtavanje[i]);
+    //iscrtavanje putanja dobijenih primenom Flojd-Varsalovog algoritma
     for(i=0; i<putanje_flojd_varsal.size(); i++)
         scene()->addItem(putanje_flojd_varsal[i]->Duzina());
+    //iscrtavanje blokiranja
     for(i=0; i<blokiranja_za_iscrtavanje.size(); i++)
         scene()->addItem(blokiranja_za_iscrtavanje[i]);
     scene()->update();
@@ -320,12 +339,12 @@ void Oblast_za_crtanje::dodaj_b_tacku(int x, int y, std::string naziv)
 
 void Oblast_za_crtanje::dodaj_s_tacku(int x, int y, std::string naziv)
 {
-    s_tacke_za_iscrtavanje.push_back(new Objekat_za_iscrtavanje(x, y, Qt::green, 40, Objekat_za_iscrtavanje::Oblik::krug, naziv));
+    s_tacke_za_iscrtavanje.push_back(new Objekat_za_iscrtavanje(x, y, Qt::darkGreen, 40, Objekat_za_iscrtavanje::Oblik::krug, naziv));
 }
 
 void Oblast_za_crtanje::dodaj_povrsinu(int x, int y, std::string naziv)
 {
-    povrsine_za_iscrtavanje.push_back(new Objekat_za_iscrtavanje(x, y, Qt::red, 200, Objekat_za_iscrtavanje::Oblik::kvadrat, naziv));
+    povrsine_za_iscrtavanje.push_back(new Objekat_za_iscrtavanje(x, y, Qt::darkBlue, 200, Objekat_za_iscrtavanje::Oblik::kvadrat, naziv));
 }
 
 Objekat_za_iscrtavanje* Oblast_za_crtanje::uzmi_b_tacku_za_iscrtavanje(int indeks)

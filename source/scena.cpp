@@ -1,59 +1,11 @@
 #include "scena.h"
 
-#include <QDebug>
-
 Scena::Scena()
 {
 }
 
 Scena::~Scena()
-{
-    delete oblast_za_crtanje;
-}
-
-Predmet::Predmet(int _pozicija, int _velicina, bool _ceka_obradu, bool _robot_drzi_predmet)
-    : pozicija(_pozicija), velicina(_velicina), ceka_obradu(_ceka_obradu), robot_drzi_predmet(_robot_drzi_predmet)
 {}
-
-int Predmet::uzmi_poziciju()
-{
-    return pozicija;
-}
-
-void Predmet::promeni_poziciju(int indeks_s_cvora)
-{
-    pozicija = indeks_s_cvora;
-}
-
-int Predmet::uzmi_velicinu()
-{
-    return velicina;
-}
-
-bool Predmet::da_li_ceka_obradu()
-{
-    return ceka_obradu;
-}
-
-void Predmet::promeni_status_obrade(bool status)
-{
-    ceka_obradu = status;
-}
-
-bool Predmet::da_li_robot_drzi_predmet()
-{
-    return robot_drzi_predmet;
-}
-
-void Predmet::uhvati_predmet()
-{
-    robot_drzi_predmet = true;
-}
-
-void Predmet::spusti_predmet()
-{
-    robot_drzi_predmet = false;
-}
 
 bool Scena::da_li_je_obrada_u_toku()
 {
@@ -148,10 +100,6 @@ void Scena::inicijalizuj_scenu(string putanja_do_fajla)
       oblast_za_crtanje->nacrtaj_scenu(trenutna_pozicija_robota, pozicije_predmeta);
     }
     else std::cout << "Nije moguce otvoriti fajl" << std::endl;
-
-//    for (int i = 0; i < predmeti.size(); i++) {
-//        qDebug() << predmeti[i].uzmi_poziciju();
-//    }
 }
 
 void Scena::dodaj_stanje_scene(int pozicija)
@@ -162,7 +110,7 @@ void Scena::dodaj_stanje_scene(int pozicija)
 vector<std::pair<int, bool>> Scena::uzmi_pozicije_predmeta(vector<Predmet> stanje_predmeta)
 {
     vector<std::pair<int, bool>> pozicije_predmeta;
-    for(int i=0; i<stanje_predmeta.size(); i++)
+    for(unsigned i=0; i<stanje_predmeta.size(); i++)
     {
         pozicije_predmeta.push_back(make_pair(stanje_predmeta[i].uzmi_poziciju(), stanje_predmeta[i].da_li_robot_drzi_predmet()));
     }
@@ -171,7 +119,7 @@ vector<std::pair<int, bool>> Scena::uzmi_pozicije_predmeta(vector<Predmet> stanj
 
 void Scena::nacrtaj_plan()
 {
-    for (int i=0; i<stanja_scene.size(); i++)
+    for (unsigned i=0; i<stanja_scene.size(); i++)
     {
         vector<std::pair<int, bool>> pozicije_predmeta = uzmi_pozicije_predmeta(stanja_scene[i].second);
         oblast_za_crtanje->azuriraj_stanje_scene(stanja_scene[i].first, pozicije_predmeta);
@@ -185,3 +133,47 @@ void Scena::ocisti_scenu()
     stanja_scene.clear();
 }
 
+//class Predmet
+Predmet::Predmet(int _pozicija, int _velicina, bool _ceka_obradu, bool _robot_drzi_predmet)
+    : pozicija(_pozicija), velicina(_velicina), ceka_obradu(_ceka_obradu), robot_drzi_predmet(_robot_drzi_predmet)
+{}
+
+int Predmet::uzmi_poziciju()
+{
+    return pozicija;
+}
+
+void Predmet::promeni_poziciju(int indeks_s_cvora)
+{
+    pozicija = indeks_s_cvora;
+}
+
+int Predmet::uzmi_velicinu()
+{
+    return velicina;
+}
+
+bool Predmet::da_li_ceka_obradu()
+{
+    return ceka_obradu;
+}
+
+void Predmet::promeni_status_obrade(bool status)
+{
+    ceka_obradu = status;
+}
+
+bool Predmet::da_li_robot_drzi_predmet()
+{
+    return robot_drzi_predmet;
+}
+
+void Predmet::uhvati_predmet()
+{
+    robot_drzi_predmet = true;
+}
+
+void Predmet::spusti_predmet()
+{
+    robot_drzi_predmet = false;
+}

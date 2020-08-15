@@ -1,12 +1,12 @@
 #ifndef SCENA_H
 #define SCENA_H
 
+#include "oblast_za_crtanje.h"
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "oblast_za_crtanje.h"
 
 using namespace std;
 
@@ -14,11 +14,9 @@ class Predmet
 {
 public:
     Predmet(int _pozicija, int _velicina, bool _ceka_obradu, bool _robot_drzi_predmet);
-
     int uzmi_poziciju();
     void promeni_poziciju(int indeks_s_cvora);
     int uzmi_velicinu();
-    //velicina se ne menja za vreme izvrsavanja, dodaje se konstruktorom
     bool da_li_ceka_obradu();
     void promeni_status_obrade(bool status);
     bool da_li_robot_drzi_predmet();
@@ -36,7 +34,6 @@ class Scena
 public:
     Scena();
     ~Scena();
-
     bool da_li_je_obrada_u_toku();
     void zapocni_obradu();
     void zavrsi_obradu();
@@ -49,7 +46,6 @@ public:
     void nacrtaj_plan();
     vector<std::pair<int, bool> > uzmi_pozicije_predmeta(vector<Predmet> stanje_predmeta);
     void ocisti_scenu();
-
     Oblast_za_crtanje* oblast_za_crtanje;
 private:
     vector<Predmet> predmeti;

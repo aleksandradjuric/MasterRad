@@ -13,9 +13,8 @@ class Prikaz_plana : public QWidget
 
 public:
     explicit Prikaz_plana(QWidget *parent = 0);
-    void postavi_tekst_plana(QString tekst);
     ~Prikaz_plana();
-
+    void postavi_tekst_plana(QString tekst);
 private:
     Ui::Prikaz_plana *ui;
 };

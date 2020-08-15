@@ -1,7 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include "prikaz_plana.h"
-#include <QDebug>
 #include <QFileDialog>
 #include <QCoreApplication>
 #include <QMessageBox>
@@ -24,9 +23,8 @@ Widget::Widget(QWidget *parent) :
 Widget::~Widget()
 {
     delete ui;
-    delete domen;
     delete scena;
-    delete pomoc;
+    delete domen;
     delete da;
 }
 
@@ -40,7 +38,6 @@ void Widget::on_btn_ucitaj_domen_clicked()
         ui->btn_ucitaj_domen->setDisabled(false);
         return;
     }
-    qDebug() << file.c_str();
     domen->inicijalizuj_domen(file);
     ui->btn_ucitaj_scenu->setDisabled(false);
 }
@@ -55,7 +52,6 @@ void Widget::on_btn_ucitaj_scenu_clicked()
         ui->btn_ucitaj_scenu->setDisabled(false);
         return;
     }
-    qDebug() << file.c_str();
     scena->inicijalizuj_scenu(file);
     ui->btn_generisi_plan->setDisabled(false);
 }
