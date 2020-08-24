@@ -11,6 +11,11 @@
 #include <QRectF>
 #include <QPen>
 #include <QGraphicsView>
+#include <QCoreApplication>
+#include <QEventLoop>
+#include <QTime>
+#include <QTimer>
+#include <memory>
 
 class Objekat_za_iscrtavanje : public QGraphicsItem
 {
@@ -39,43 +44,48 @@ private:
 class Putanja_za_iscrtavanje
 {
 public:
-    Putanja_za_iscrtavanje(Objekat_za_iscrtavanje* prva_b_tacka, Objekat_za_iscrtavanje* druga_b_tacka, int _duzina, bool _direktna_putanja);
+    Putanja_za_iscrtavanje(std::shared_ptr<Objekat_za_iscrtavanje> _prva_b_tacka, std::shared_ptr<Objekat_za_iscrtavanje> _druga_b_tacka, int _duzina, bool _direktna_putanja);
     ~Putanja_za_iscrtavanje();
-    QGraphicsLineItem *Linija();
-    QGraphicsTextItem *Duzina();
+    std::shared_ptr<QGraphicsLineItem> Linija();
+    std::shared_ptr<QGraphicsTextItem> Duzina();
 private:
-    QGraphicsLineItem* linija;
-    QGraphicsTextItem* duzina;
+    std::shared_ptr<QGraphicsLineItem> linija;
+    std::shared_ptr<QGraphicsTextItem> duzina;
     bool direktna_putanja;
 };
 
 class Oblast_za_crtanje : public QGraphicsView
 {
+    Q_OBJECT
+
 public:
     Oblast_za_crtanje(QWidget *parent);
     ~Oblast_za_crtanje();
     void dodaj_b_tacku(int x, int y, std::string naziv);
     void dodaj_s_tacku(int x, int y, std::string naziv);
     void dodaj_povrsinu(int x, int y, std::string naziv);
-    void dodaj_blokiranje(Objekat_za_iscrtavanje* druga_s_tacka, std::string naziv);
-    Objekat_za_iscrtavanje* uzmi_b_tacku_za_iscrtavanje(int indeks);
-    Objekat_za_iscrtavanje* uzmi_s_tacku_za_iscrtavanje(int indeks);
-    void dodaj_putanju(Objekat_za_iscrtavanje* prva_b_tacka, Objekat_za_iscrtavanje* druga_b_tacka, int duzina, bool direktna_putanja);
-    void dodaj_putanju_flojd_varsal(Objekat_za_iscrtavanje* prva_b_tacka, Objekat_za_iscrtavanje* druga_b_tacka, int duzina, bool direktna_putanja);
-    void nacrtaj_scenu(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>> pozicije_predmeta);
-    void azuriraj_stanje_scene(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>> pozicije_predmeta, bool animacija_u_toku);
+    void dodaj_blokiranje(std::shared_ptr<Objekat_za_iscrtavanje> druga_s_tacka, std::string naziv);
+    std::shared_ptr<Objekat_za_iscrtavanje> uzmi_b_tacku_za_iscrtavanje(int indeks);
+    std::shared_ptr<Objekat_za_iscrtavanje> uzmi_s_tacku_za_iscrtavanje(int indeks);
+    void dodaj_putanju(std::shared_ptr<Objekat_za_iscrtavanje> prva_b_tacka, std::shared_ptr<Objekat_za_iscrtavanje> druga_b_tacka, int duzina, bool direktna_putanja);
+    void dodaj_putanju_flojd_varsal(std::shared_ptr<Objekat_za_iscrtavanje> prva_b_tacka, std::shared_ptr<Objekat_za_iscrtavanje> druga_b_tacka, int duzina, bool direktna_putanja);
+    void nacrtaj_scenu(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>>& pozicije_predmeta);
+    void azuriraj_stanje_scene(int indeks_b_tacke_robota, std::vector<std::pair<int, bool>>& pozicije_predmeta, bool animacija_u_toku);
     void nacrtaj_domen();
     void ocisti_scenu();
     void delay(int sekunde);
+    void azuriraj_slajder(int i);
+signals:
+    void on_azuriraj_slajderSignal(int);
 private:
-    std::vector<Objekat_za_iscrtavanje*> b_tacke_za_iscrtavanje;
-    std::vector<Objekat_za_iscrtavanje*> s_tacke_za_iscrtavanje;
-    std::vector<Objekat_za_iscrtavanje*> povrsine_za_iscrtavanje;
-    std::vector<Objekat_za_iscrtavanje*> blokiranja_za_iscrtavanje;
-    std::vector<Putanja_za_iscrtavanje*> putanje_za_iscrtavanje;
-    std::vector<Putanja_za_iscrtavanje*> putanje_flojd_varsal;
-    std::vector<Objekat_za_iscrtavanje*> predmeti_za_iscrtavanje;
-    Objekat_za_iscrtavanje* robot_za_iscrtavanje;
+    std::vector<std::shared_ptr<Objekat_za_iscrtavanje>> b_tacke_za_iscrtavanje;
+    std::vector<std::shared_ptr<Objekat_za_iscrtavanje>> s_tacke_za_iscrtavanje;
+    std::vector<std::shared_ptr<Objekat_za_iscrtavanje>> povrsine_za_iscrtavanje;
+    std::vector<std::shared_ptr<Objekat_za_iscrtavanje>> blokiranja_za_iscrtavanje;
+    std::vector<std::shared_ptr<Putanja_za_iscrtavanje>> putanje_za_iscrtavanje;
+    std::vector<std::shared_ptr<Putanja_za_iscrtavanje>> putanje_flojd_varsal;
+    std::vector<std::shared_ptr<Objekat_za_iscrtavanje>> predmeti_za_iscrtavanje;
+    std::shared_ptr<Objekat_za_iscrtavanje> robot_za_iscrtavanje;
 };
 
 #endif // OBLAST_ZA_CRTANJE_H

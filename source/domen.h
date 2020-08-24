@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <QPoint>
 #include <QGraphicsItem>
+#include <memory>
 
 #define INF 99999
 
@@ -47,7 +48,7 @@ class Putanja
 {
 public:
     Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina);
-    Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina, vector<int> _sekvenca_b_tacki);
+    Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina, vector<int>& _sekvenca_b_tacki);
     int uzmi_indeks_prve_b_tacke();
     int uzmi_indeks_druge_b_tacke();
     int uzmi_duzinu();
@@ -79,7 +80,7 @@ public:
     vector<int> uzmi_sekvencu_tacaka_za_par_b_tacaka(int indeks_b_tacke_1, int indeks_b_tacke_2);
     void ocisti_domen();
 
-    Oblast_za_crtanje* oblast_za_crtanje;
+    std::shared_ptr<Oblast_za_crtanje> oblast_za_crtanje;
 
 private:
     vector<Povrsina> povrsine;
@@ -89,7 +90,7 @@ private:
     vector<vector<bool>> medjusobna_blokiranja_s_tacaka;
     //neophodno za primenu Flojd-Varsalovog algoritma
     vector<vector<int>> matrica_prelaza;  //pomocna matrica
-    void ispisi_matricu(vector<vector<int>> matrica);
+    void ispisi_matricu(vector<vector<int>>& matrica);
     void pronadji_sekvencu_tacaka(int i, int j, vector<int>& sekvenca_tacaka);
     void nadji_najkrace_putanje_izmedju_b_tacaka();
     void inicijalizuj_medjusobna_blokiranja();

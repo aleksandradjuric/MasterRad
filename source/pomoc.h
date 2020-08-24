@@ -2,6 +2,7 @@
 #define POMOC_H
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui {
 class Pomoc;
@@ -15,7 +16,7 @@ public:
     explicit Pomoc(QWidget *parent = 0);
     ~Pomoc();
 private:
-    Ui::Pomoc *ui;
+    std::shared_ptr<Ui::Pomoc> ui;
 };
 
 #endif // POMOC_H

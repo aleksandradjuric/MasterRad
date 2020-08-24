@@ -2,6 +2,7 @@
 #define PRIKAZ_PLANA_H
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui {
 class Prikaz_plana;
@@ -16,7 +17,7 @@ public:
     ~Prikaz_plana();
     void postavi_tekst_plana(QString tekst);
 private:
-    Ui::Prikaz_plana *ui;
+    std::shared_ptr<Ui::Prikaz_plana> ui;
 };
 
 #endif // PRIKAZ_PLANA_H

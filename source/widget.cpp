@@ -1,33 +1,24 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "prikaz_plana.h"
-#include <QFileDialog>
-#include <QCoreApplication>
-#include <QMessageBox>
-#include <QTextStream>
-#include <QTime>
 
 Widget::Widget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Widget)
+    QWidget(parent)
 {
+    ui = std::make_shared<Ui::Widget>();
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
-    da = ui->graphicsView;
-    domen = new Domen();
+    std::shared_ptr<Oblast_za_crtanje> graphicsView(ui->graphicsView);
+    da = graphicsView;
+    domen = std::make_shared<Domen>();
     domen->oblast_za_crtanje = da;
-    scena = new Scena();
+    scena = std::make_shared<Scena>();
     scena->oblast_za_crtanje = da;
-    connect(scena, SIGNAL(on_azuriraj_slajderSignal(int)), this, SLOT(on_azurirajSlajderTriggered(int)));
+    connect(da.get(), SIGNAL(on_azuriraj_slajderSignal(int)), this, SLOT(on_azurirajSlajderTriggered(int)));
 }
 
 Widget::~Widget()
 {
-    disconnect(scena, SIGNAL(on_azuriraj_slajderSignal(int)), this, SLOT(on_azurirajSlajderTriggered(int)));
-    delete ui;
-    delete scena;
-    delete domen;
-    delete da;
+    disconnect(da.get(), SIGNAL(on_azuriraj_slajderSignal(int)), this, SLOT(on_azurirajSlajderTriggered(int)));
 }
 
 void Widget::on_btn_ucitaj_domen_clicked()
@@ -62,7 +53,7 @@ void Widget::on_btn_ucitaj_scenu_clicked()
 
 void Widget::on_btn_pomoc_clicked()
 {
-    pomoc = new Pomoc();
+    pomoc = std::make_shared<Pomoc>();
     pomoc->setMinimumSize(900,650);
     pomoc->setMaximumSize(900,650);
     pomoc->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
@@ -77,7 +68,7 @@ void Widget::on_btn_otvori_fajl_clicked()
     if(file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QTextStream in(&file);
-        Prikaz_plana* prikaz_plana = new Prikaz_plana();
+        prikaz_plana = std::make_shared<Prikaz_plana>();
         prikaz_plana->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
         prikaz_plana->move(QApplication::desktop()->screen()->rect().center() - prikaz_plana->rect().center());
         prikaz_plana->postavi_tekst_plana(in.readAll());
@@ -91,7 +82,7 @@ void Widget::on_btn_generisi_plan_clicked()
     QTime timer;
     ui->btn_generisi_plan->setDisabled(true);
     int maksimalna_duzinja_putanje = ui->sb_maksimalna_duzina_putanje->value();
-    planiranje = new Planiranje(*domen, scena, maksimalna_duzinja_putanje);
+    planiranje = std::make_shared<Planiranje>(domen, scena, maksimalna_duzinja_putanje);
 
     timer.start();
     bool sat = planiranje->generisi_plan();
@@ -141,6 +132,7 @@ void Widget::on_btn_pocni_animaciju_clicked()
     ui->btn_zaustavi_animaciju->setDisabled(false);
     ui->btn_pocni_animaciju->setDisabled(true);
     ui->slider_animacija->setDisabled(true);
+    ui->btn_pocni_ponovo->setDisabled(true);
     scena->promeni_stanje_animacije(true);
     int trenutni_frejm = ui->slider_animacija->value();
     scena->nacrtaj_plan(trenutni_frejm);
@@ -151,6 +143,7 @@ void Widget::on_btn_zaustavi_animaciju_clicked()
     ui->btn_zaustavi_animaciju->setDisabled(true);
     ui->btn_pocni_animaciju->setDisabled(false);
     ui->slider_animacija->setDisabled(false);
+    ui->btn_pocni_ponovo->setDisabled(false);
     scena->promeni_stanje_animacije(false);
 }
 

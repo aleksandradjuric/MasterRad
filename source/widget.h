@@ -6,10 +6,17 @@
 #include "oblast_za_crtanje.h"
 #include "pomoc.h"
 #include "planiranje.h"
+#include "prikaz_plana.h"
 #include <QWidget>
 #include <QGraphicsView>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QFileDialog>
+#include <QCoreApplication>
+#include <QMessageBox>
+#include <QTextStream>
+#include <QTime>
+#include <memory>
 
 namespace Ui {
 class Widget;
@@ -23,12 +30,13 @@ public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
 private:
-    Oblast_za_crtanje *da;
-    Ui::Widget *ui;
-    Domen *domen;
-    Scena *scena;
-    Pomoc *pomoc;
-    Planiranje* planiranje;
+    std::shared_ptr<Ui::Widget> ui;
+    std::shared_ptr<Oblast_za_crtanje> da;
+    std::shared_ptr<Domen> domen;
+    std::shared_ptr<Scena> scena;
+    std::shared_ptr<Pomoc> pomoc;
+    std::shared_ptr<Prikaz_plana> prikaz_plana;
+    std::shared_ptr<Planiranje> planiranje;
 public slots:
     void on_azurirajSlajderTriggered(int);
 private slots:

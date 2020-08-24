@@ -1,9 +1,7 @@
 #include "domen.h"
-#include "oblast_za_crtanje.h"
 
 Domen::Domen()
-{
-}
+{}
 
 Domen::~Domen()
 {}
@@ -244,7 +242,7 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
     }
 }
 
-void Domen::ispisi_matricu(vector<vector<int>> matrica){
+void Domen::ispisi_matricu(vector<vector<int> > &matrica){
     int duzina = matrica.size();
     for(int i=0; i<duzina; i++){
         for(int j=0; j<duzina; j++)
@@ -294,7 +292,7 @@ Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina)
     : indeks_b_tacke_1(_indeks_b_tacke_1), indeks_b_tacke_2(_indeks_b_tacke_2), duzina(_duzina)
 {}
 
-Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina, vector<int> _sekvenca_b_tacki)
+Putanja::Putanja(int _indeks_b_tacke_1, int _indeks_b_tacke_2, int _duzina, vector<int>& _sekvenca_b_tacki)
     : indeks_b_tacke_1(_indeks_b_tacke_1), indeks_b_tacke_2(_indeks_b_tacke_2), duzina(_duzina), sekvenca_b_tacki(_sekvenca_b_tacki)
 {}
 
@@ -331,8 +329,7 @@ string Povrsina::uzmi_ime_povrsine()
 //class B_tacka
 B_tacka::B_tacka(int _indeks_povrsine)
     : indeks_povrsine(_indeks_povrsine)
-{
-}
+{}
 
 int B_tacka::uzmi_indeks_povrsine()
 {

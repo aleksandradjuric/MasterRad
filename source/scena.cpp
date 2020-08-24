@@ -1,9 +1,7 @@
 #include "scena.h"
 
-Scena::Scena(QObject *parent)
-    :QObject(parent)
-{
-}
+Scena::Scena()
+{}
 
 Scena::~Scena()
 {}
@@ -108,7 +106,7 @@ void Scena::dodaj_stanje_scene(int pozicija)
     stanja_scene.push_back(make_pair(pozicija, predmeti));
 }
 
-vector<std::pair<int, bool>> Scena::uzmi_pozicije_predmeta(vector<Predmet> stanje_predmeta)
+vector<std::pair<int, bool>> Scena::uzmi_pozicije_predmeta(vector<Predmet>& stanje_predmeta)
 {
     vector<std::pair<int, bool>> pozicije_predmeta;
     for(unsigned i=0; i<stanje_predmeta.size(); i++)
@@ -125,7 +123,7 @@ void Scena::nacrtaj_plan(int trenutni_frejm)
         if (!animacija_u_toku)
             break;
         nacrtaj_stanje_scene(i);
-        emit on_azuriraj_slajderSignal(i);
+        oblast_za_crtanje->azuriraj_slajder(i);
     }
 }
 
@@ -196,3 +194,4 @@ void Predmet::spusti_predmet()
 {
     robot_drzi_predmet = false;
 }
+

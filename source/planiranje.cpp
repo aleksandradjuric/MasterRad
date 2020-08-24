@@ -1,10 +1,9 @@
 #include "planiranje.h"
-#include <z3++.h>
 
 using namespace std;
 using namespace z3;
 
-Planiranje::Planiranje(Domen _domen, Scena* _scena, int _maksimalna_duzinja_putanje)
+Planiranje::Planiranje(std::shared_ptr<Domen> _domen, std::shared_ptr<Scena> _scena, int _maksimalna_duzinja_putanje)
 {
     domen = _domen;
     scena = _scena;
@@ -58,25 +57,25 @@ bool Planiranje::generisi_plan()
 
         //dodavanje informacija o putanjama
         expr uslov_za_sve_putanje = boolean_false; //((trenutna_pozicija == b) && (duzina_putanje == 0));
-        int duzina_niza_putanja = domen.uzmi_duzinu_niza_putanja();
+        int duzina_niza_putanja = domen->uzmi_duzinu_niza_putanja();
         for(i=0; i<duzina_niza_putanja; i++)
         {
             expr uslov_za_putanju1 = putanja(trenutna_pozicija, b) == boolean_true;
-            expr uslov_za_putanju2 = (trenutna_pozicija == domen.uzmi_putanju(i).uzmi_indeks_prve_b_tacke());
-            expr uslov_za_putanju3 = (b == domen.uzmi_putanju(i).uzmi_indeks_druge_b_tacke());
-            expr uslov_za_putanju4 = (duzina_putanje == domen.uzmi_putanju(i).uzmi_duzinu());
+            expr uslov_za_putanju2 = (trenutna_pozicija == domen->uzmi_putanju(i).uzmi_indeks_prve_b_tacke());
+            expr uslov_za_putanju3 = (b == domen->uzmi_putanju(i).uzmi_indeks_druge_b_tacke());
+            expr uslov_za_putanju4 = (duzina_putanje == domen->uzmi_putanju(i).uzmi_duzinu());
             uslov_za_sve_putanje = uslov_za_sve_putanje || (uslov_za_putanju1 && uslov_za_putanju2 && uslov_za_putanju3 && uslov_za_putanju4);
         }
         robot_resavac.add(uslov_za_sve_putanje);
 
         //izdvajanje indeksa b tacke masine za obradu i skladista
         int indeks_b_tacke_masine, indeks_b_tacke_skladista;
-        int duzina_niza_b_tacaka = domen.uzmi_duzinu_niza_b_tacaka();
+        int duzina_niza_b_tacaka = domen->uzmi_duzinu_niza_b_tacaka();
         for(i=0; i<duzina_niza_b_tacaka; i++){
-            if(domen.uzmi_povrsinu(domen.uzmi_b_tacku(i).uzmi_indeks_povrsine()).uzmi_ime_povrsine() == "masina_za_obradu"){
+            if(domen->uzmi_povrsinu(domen->uzmi_b_tacku(i).uzmi_indeks_povrsine()).uzmi_ime_povrsine() == "masina_za_obradu"){
                 indeks_b_tacke_masine = i;
             }
-            if(domen.uzmi_povrsinu(domen.uzmi_b_tacku(i).uzmi_indeks_povrsine()).uzmi_ime_povrsine() == "skladiste"){
+            if(domen->uzmi_povrsinu(domen->uzmi_b_tacku(i).uzmi_indeks_povrsine()).uzmi_ime_povrsine() == "skladiste"){
                 indeks_b_tacke_skladista = i;
             }
         }
@@ -88,16 +87,16 @@ bool Planiranje::generisi_plan()
         //dodavanje informacija o tome koje pozicije u masini za obradu blokiraju jedne druge
         //cuva indeks s tacaka koji predstavljaju mesta u masini
         vector<int> s_tacke_masine;
-        int duzina_niza_s_tacaka = domen.uzmi_duzinu_niza_s_tacaka();
+        int duzina_niza_s_tacaka = domen->uzmi_duzinu_niza_s_tacaka();
         for(i=0; i<duzina_niza_s_tacaka; i++)
-            if(domen.uzmi_s_tacku(i).uzmi_indeks_b_tacke() == indeks_b_tacke_masine)
+            if(domen->uzmi_s_tacku(i).uzmi_indeks_b_tacke() == indeks_b_tacke_masine)
                 s_tacke_masine.push_back(i);
         int duzina_niza_s_tacaka_masine = s_tacke_masine.size();
 
         //cuva indeks s tacaka koji predstavljaju mesta u skladistu
         vector<int> s_tacke_skladista;
         for(i=0; i<duzina_niza_s_tacaka; i++)
-            if(domen.uzmi_s_tacku(i).uzmi_indeks_b_tacke() == indeks_b_tacke_skladista)
+            if(domen->uzmi_s_tacku(i).uzmi_indeks_b_tacke() == indeks_b_tacke_skladista)
                 s_tacke_skladista.push_back(i);
         int duzina_niza_s_tacaka_skladista = s_tacke_skladista.size();
 
@@ -105,7 +104,7 @@ bool Planiranje::generisi_plan()
         expr informacije_o_blokiranju = boolean_true;
         for(i=0; i<duzina_niza_s_tacaka; i++)
             for(j=0; j<duzina_niza_s_tacaka; j++)
-                if(domen.da_li_blokira(i, j))
+                if(domen->da_li_blokira(i, j))
                     informacije_o_blokiranju = informacije_o_blokiranju && (blokira(robot_kontekst.int_val(i), robot_kontekst.int_val(j)) == boolean_true);
         robot_resavac.add(informacije_o_blokiranju);
 
@@ -121,7 +120,7 @@ bool Planiranje::generisi_plan()
         /* PAKOVANJE PREDMETA U MASINU ZA OBRADU */
         bool uslov_petlje = false;
         for (int i=0; i<duzina_niza_predmeta; i++)
-            uslov_petlje = uslov_petlje || ((domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine) && scena->uzmi_predmet(i).da_li_ceka_obradu());
+            uslov_petlje = uslov_petlje || ((domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine) && scena->uzmi_predmet(i).da_li_ceka_obradu());
 
         //ispis inicijalne scene
         stream << "INICIJALNA SCENA:\n";
@@ -180,7 +179,7 @@ bool Planiranje::generisi_plan()
             //predmet nije u masini (dodavanje trenutnog stanja)
             expr uslov_izabrani_predmet_nije_u_masini = boolean_false;
                     for(int i=0; i<duzina_niza_predmeta; i++)
-                        uslov_izabrani_predmet_nije_u_masini = uslov_izabrani_predmet_nije_u_masini || (izabrani_predmet_nije_u_masini(izabrani_predmet) == (domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine ? boolean_true : boolean_false) && (izabrani_predmet == i));
+                        uslov_izabrani_predmet_nije_u_masini = uslov_izabrani_predmet_nije_u_masini || (izabrani_predmet_nije_u_masini(izabrani_predmet) == (domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine ? boolean_true : boolean_false) && (izabrani_predmet == i));
             robot_resavac.add(uslov_izabrani_predmet_nije_u_masini);
 
             //uslovi koji treba da budu ispunjeni za korak "nadji mesto"
@@ -197,7 +196,7 @@ bool Planiranje::generisi_plan()
             //ne postoji veci predmet koji ceka obradu od izabranog predmeta koji nije vec u masini
             expr ne_postoji_veci_van_masine = boolean_true;
             for (int i=0; i<duzina_niza_predmeta; i++)
-                if((domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine) && (scena->uzmi_predmet(i).da_li_ceka_obradu()))
+                if((domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine) && (scena->uzmi_predmet(i).da_li_ceka_obradu()))
                     ne_postoji_veci_van_masine = ne_postoji_veci_van_masine && (veci(robot_kontekst.int_val(i), izabrani_predmet) == boolean_false);
             robot_resavac.add(ne_postoji_veci_van_masine);
             robot_resavac.add(izabrani_predmet_nije_u_masini(izabrani_predmet) == boolean_true);
@@ -254,7 +253,7 @@ bool Planiranje::generisi_plan()
                 int s_tacka_predmeta = scena->uzmi_predmet(izabrani_predmet_dobijen_iz_modela).uzmi_poziciju();
                 vector<int> zauzete_s_tacke_povrsina;
                 for(i=0; i<duzina_niza_predmeta; i++){
-                    if( domen.uzmi_s_tacku(s_tacka_predmeta).uzmi_indeks_b_tacke() != indeks_b_tacke_masine && domen.uzmi_s_tacku(s_tacka_predmeta).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista)
+                    if( domen->uzmi_s_tacku(s_tacka_predmeta).uzmi_indeks_b_tacke() != indeks_b_tacke_masine && domen->uzmi_s_tacku(s_tacka_predmeta).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista)
                         zauzete_s_tacke_povrsina.push_back(s_tacka_predmeta);
                 }
                 int duzina_niza_zauzetih_s_tacaka_povrsina = zauzete_s_tacke_povrsina.size();
@@ -269,7 +268,7 @@ bool Planiranje::generisi_plan()
                 //opis putanja je vec dodat, dodaju se samo uslovi koji treba da budu ispunjeni:
                 robot_resavac.add(trenutna_pozicija == pozicija_robota_pre_koraka_pokupi);
                 robot_resavac.add(putanja(trenutna_pozicija, b) == boolean_true);
-                robot_resavac.add(b == domen.uzmi_s_tacku(scena->uzmi_predmet(izabrani_predmet_dobijen_iz_modela).uzmi_poziciju()).uzmi_indeks_b_tacke());
+                robot_resavac.add(b == domen->uzmi_s_tacku(scena->uzmi_predmet(izabrani_predmet_dobijen_iz_modela).uzmi_poziciju()).uzmi_indeks_b_tacke());
 
                 //izabrani predmet nema drugi predmet koji ga blokira
                 int indeks_s_tacke_izabranog_predmeta = scena->uzmi_predmet(izabrani_predmet_dobijen_iz_modela).uzmi_poziciju();
@@ -301,7 +300,7 @@ bool Planiranje::generisi_plan()
                                     ukupna_duzina_predjene_putanje += duzina_putanje_dobijena_iz_modela;
                                 }
                             }
-                            sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(pozicija_robota_pre_koraka_pokupi, b_dobijeno_iz_modela);
+                            sekvenca_b_tacaka = domen->uzmi_sekvencu_tacaka_za_par_b_tacaka(pozicija_robota_pre_koraka_pokupi, b_dobijeno_iz_modela);
                             for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                 scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                             scena->promeni_trenutnu_poziciju_robota(b_dobijeno_iz_modela);
@@ -373,7 +372,7 @@ bool Planiranje::generisi_plan()
                                     scena->promeni_trenutnu_poziciju_robota(indeks_b_tacke_masine);
                                     stream << "pozicija robota je promenjena \n" << "trenutna pozicija robota je b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << "\n";
                                     stream << "do cvora b[" << scena->uzmi_trenutnu_poziciju_robota() << "]" << " je predjen put " << duzina_putanje_dobijena_iz_modela << "\n";
-                                    sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(trenutna_pozicija_robota, scena->uzmi_trenutnu_poziciju_robota());
+                                    sekvenca_b_tacaka = domen->uzmi_sekvencu_tacaka_za_par_b_tacaka(trenutna_pozicija_robota, scena->uzmi_trenutnu_poziciju_robota());
                                     for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                         scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                                     p.spusti_predmet();
@@ -393,7 +392,7 @@ bool Planiranje::generisi_plan()
 
             uslov_petlje = false;
             for (int i=0; i<duzina_niza_predmeta; i++)
-                uslov_petlje = uslov_petlje || ((domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine) && scena->uzmi_predmet(i).da_li_ceka_obradu());
+                uslov_petlje = uslov_petlje || ((domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_masine) && scena->uzmi_predmet(i).da_li_ceka_obradu());
           }
         stream << "Korak pakovanja predmeta u masinu za obradu je: " << (prvi_korak_je_zadovoljiv ? "SAT" : "UNSAT") << "\n";
 
@@ -408,7 +407,7 @@ bool Planiranje::generisi_plan()
             /* PAKOVANJE OBRADJENIH PREDMETA U SKLADISTE */
             bool uslov_petlje = false;
             for (int i=0; i<duzina_niza_predmeta; i++)
-                uslov_petlje = uslov_petlje || ((domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista) && !(scena->uzmi_predmet(i).da_li_ceka_obradu()));
+                uslov_petlje = uslov_petlje || ((domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista) && !(scena->uzmi_predmet(i).da_li_ceka_obradu()));
 
             dodatni_uslov = boolean_true;
 
@@ -459,7 +458,7 @@ bool Planiranje::generisi_plan()
 
                 expr uslov_za_poziciju_izabranog_predmeta = boolean_false;
                     for(int i=0; i<duzina_niza_predmeta; i++)
-                        if(domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() == indeks_b_tacke_masine)
+                        if(domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() == indeks_b_tacke_masine)
                             uslov_za_poziciju_izabranog_predmeta = uslov_za_poziciju_izabranog_predmeta || ((pozicija_izabranog_predmeta == scena->uzmi_predmet(i).uzmi_poziciju()) && (izabrani_predmet == i));
                 robot_resavac.add(uslov_za_poziciju_izabranog_predmeta);
 
@@ -575,7 +574,7 @@ bool Planiranje::generisi_plan()
                                         ukupna_duzina_predjene_putanje += duzina_putanje_dobijena_iz_modela;
                                     }
                                 }
-                                sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(pozicija_robota_pre_koraka_pokupi, indeks_b_tacke_masine);
+                                sekvenca_b_tacaka = domen->uzmi_sekvencu_tacaka_za_par_b_tacaka(pozicija_robota_pre_koraka_pokupi, indeks_b_tacke_masine);
                                 for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                     scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                                 scena->promeni_trenutnu_poziciju_robota(indeks_b_tacke_masine);
@@ -645,7 +644,7 @@ bool Planiranje::generisi_plan()
                                                 ukupna_duzina_predjene_putanje += duzina_putanje_dobijena_iz_modela;
                                             }
                                         }
-                                        sekvenca_b_tacaka = domen.uzmi_sekvencu_tacaka_za_par_b_tacaka(indeks_b_tacke_masine, indeks_b_tacke_skladista);
+                                        sekvenca_b_tacaka = domen->uzmi_sekvencu_tacaka_za_par_b_tacaka(indeks_b_tacke_masine, indeks_b_tacke_skladista);
                                         for (unsigned i = 0; i < sekvenca_b_tacaka.size(); i++)
                                             scena->dodaj_stanje_scene(sekvenca_b_tacaka[i]);
                                         scena->promeni_trenutnu_poziciju_robota(indeks_b_tacke_skladista);
@@ -668,7 +667,7 @@ bool Planiranje::generisi_plan()
 
                 uslov_petlje = false;
                 for (int i=0; i<duzina_niza_predmeta; i++)
-                    uslov_petlje = uslov_petlje || ((domen.uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista) && !(scena->uzmi_predmet(i).da_li_ceka_obradu()));
+                    uslov_petlje = uslov_petlje || ((domen->uzmi_s_tacku(scena->uzmi_predmet(i).uzmi_poziciju()).uzmi_indeks_b_tacke() != indeks_b_tacke_skladista) && !(scena->uzmi_predmet(i).da_li_ceka_obradu()));
             }
             stream << "Korak pakovanja predmeta u skladiste je: " << (prvi_korak_je_zadovoljiv ? "SAT" : "UNSAT") << "\n";
         }
