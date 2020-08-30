@@ -11,8 +11,7 @@
 #include <QPoint>
 #include <QGraphicsItem>
 #include <memory>
-
-#define INF 99999
+#include <limits>
 
 using namespace std;
 

@@ -167,6 +167,7 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
 
     int duzina_niza_b_tacaka = uzmi_duzinu_niza_b_tacaka();
     int duzina_niza_putanja = uzmi_duzinu_niza_putanja();
+    int int_max = std::numeric_limits<int>::max();
     vector<vector<int>> pocetna_matrica_putanja;
     vector<vector<int>> rezultujuca_matrica_putanja;
 
@@ -177,7 +178,7 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
             if (i == j)
                 tacke.push_back(0);
             else
-                tacke.push_back(INF);
+                tacke.push_back(int_max);
         }
         rezultujuca_matrica_putanja.push_back(tacke);
         pocetna_matrica_putanja.push_back(tacke);
@@ -201,7 +202,7 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
     for (int i=0; i<duzina_niza_b_tacaka; i++) {
         for (int j=0; j<duzina_niza_b_tacaka; j++) {
             rezultujuca_matrica_putanja[i][j] = pocetna_matrica_putanja[i][j];
-            if (i != j && pocetna_matrica_putanja[i][j] != INF)
+            if (i != j && pocetna_matrica_putanja[i][j] != int_max)
                 matrica_prelaza[i][j] = i;
             else
                 matrica_prelaza[i][j] = -1;
@@ -213,7 +214,7 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
         for (int i = 0; i < duzina_niza_b_tacaka; i++) {
             for (int j = 0; j < duzina_niza_b_tacaka; j++) {
                 if (rezultujuca_matrica_putanja[i][j] > (rezultujuca_matrica_putanja[i][k] + rezultujuca_matrica_putanja[k][j]) &&
-                    rezultujuca_matrica_putanja[i][k] != INF && rezultujuca_matrica_putanja[k][j] != INF)
+                    rezultujuca_matrica_putanja[i][k] != int_max && rezultujuca_matrica_putanja[k][j] != int_max)
                 {
                     rezultujuca_matrica_putanja[i][j] = rezultujuca_matrica_putanja[i][k] + rezultujuca_matrica_putanja[k][j];
                     matrica_prelaza[i][j] = matrica_prelaza[k][j];
@@ -232,7 +233,7 @@ void Domen::nadji_najkrace_putanje_izmedju_b_tacaka()
                 sekvenca_tacaka.push_back(i);
                 putanje.push_back(Putanja(i,i,0,sekvenca_tacaka));
             }
-            else if(duzina != INF)
+            else if(duzina != int_max)
             {
                 pronadji_sekvencu_tacaka(i, j, sekvenca_tacaka);
                 std::reverse(sekvenca_tacaka.begin(), sekvenca_tacaka.end());
